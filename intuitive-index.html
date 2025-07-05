@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Intuitive Creator's Interactive Blueprint</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earthy Harmony -->
+    <!-- Application Structure Plan: The SPA is structured as a personal journey with a fixed sidebar navigation for easy access to all sections. This avoids a linear, report-like feel and empowers the user to explore what's most relevant to them at any moment, which is key for the Intuitive Creator. The flow is: 1. Welcome (sets the stage), 2. Profile (understanding the self via an interactive chart), 3. Systems (learning the core philosophy), 4. Toolkit (actionable strategies), 5. Resources (filterable tools), and 6. Troubleshoot (on-demand solutions). This structure directly addresses the user's need for flexible, non-linear exploration and practical, accessible information. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Natural Gifts vs. Growth Edges -> Goal: Compare/Inform -> Viz: Interactive Radar Chart (Chart.js) -> Interaction: Hover to see details. -> Justification: Provides a holistic, balanced self-view that is more engaging than simple lists and visually represents the duality of the personality.
+        - Report Info: Practical Strategies & Hacks -> Goal: Organize/Interact -> Viz: Interactive Card Grid (HTML/CSS/JS) -> Interaction: Click card to reveal detailed strategies. -> Justification: Manages a large amount of information in a non-overwhelming, categorized, and browsable format.
+        - Report Info: Recommended Tools -> Goal: Organize/Filter -> Viz: Filterable Tool Gallery (HTML/CSS/JS) -> Interaction: Filter buttons to show/hide tool cards by category. -> Justification: Makes a long, list-based section from the report highly usable and allows users to quickly find tools relevant to their needs.
+        - Report Info: Troubleshooting Hurdles -> Goal: Guide/Solve -> Viz: Accordion Component (HTML/CSS/JS) -> Interaction: Click a "hurdle" to expand the solution. -> Justification: Creates a coaching-like, Q&A experience that delivers targeted advice efficiently. 
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .bg-primary { background-color: #FDFBF8; }
+        .bg-secondary { background-color: #F4EFEA; }
+        .bg-accent { background-color: #D3A993; }
+        .text-accent { color: #B98B73; }
+        .border-accent { border-color: #D3A993; }
+        .ring-accent:focus { ring-color: #B98B73; }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            background-color: #D3A993;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #F4EFEA;
+            color: #B98B73;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .card-enter {
+            animation: card-enter 0.5s ease-out forwards;
+        }
+        @keyframes card-enter {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in {
+            animation: fade-in 0.6s ease-in-out forwards;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside class="w-16 md:w-64 bg-secondary text-gray-800 flex flex-col transition-all duration-300">
+            <div class="h-20 flex items-center justify-center md:justify-start md:px-6 border-b border-gray-200">
+                <span class="text-2xl text-accent md:hidden">IC</span>
+                <span class="hidden md:block text-xl font-bold text-accent">Intuitive Creator</span>
+            </div>
+            <nav class="flex-grow pt-6 space-y-2">
+                <a href="#welcome" class="nav-link flex items-center py-3 px-5 md:px-6 rounded-lg mx-2 md:mx-4">
+                    <span class="text-xl">🏠</span><span class="hidden md:inline-block ml-4">Welcome</span>
+                </a>
+                <a href="#profile" class="nav-link flex items-center py-3 px-5 md:px-6 rounded-lg mx-2 md:mx-4">
+                    <span class="text-xl">🧠</span><span class="hidden md:inline-block ml-4">Your Profile</span>
+                </a>
+                <a href="#systems" class="nav-link flex items-center py-3 px-5 md:px-6 rounded-lg mx-2 md:mx-4">
+                    <span class="text-xl">🌱</span><span class="hidden md:inline-block ml-4">Your System</span>
+                </a>
+                <a href="#toolkit" class="nav-link flex items-center py-3 px-5 md:px-6 rounded-lg mx-2 md:mx-4">
+                    <span class="text-xl">🛠️</span><span class="hidden md:inline-block ml-4">Strategy Toolkit</span>
+                </a>
+                <a href="#resources" class="nav-link flex items-center py-3 px-5 md:px-6 rounded-lg mx-2 md:mx-4">
+                    <span class="text-xl">📚</span><span class="hidden md:inline-block ml-4">Resource Hub</span>
+                </a>
+                <a href="#troubleshoot" class="nav-link flex items-center py-3 px-5 md:px-6 rounded-lg mx-2 md:mx-4">
+                    <span class="text-xl">💡</span><span class="hidden md:inline-block ml-4">Troubleshoot</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-10 bg-primary">
+            
+            <!-- Welcome Section -->
+            <section id="welcome" class="content-section">
+                <div class="fade-in">
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-800">The Intuitive Creator's Blueprint</h1>
+                    <p class="mt-4 text-lg text-gray-600">Harnessing Your Creative Superpower for Unstoppable Productivity.</p>
+                    <div class="mt-8 p-8 bg-secondary rounded-xl shadow-sm">
+                        <h2 class="text-2xl font-semibold text-accent">Welcome to Your Interactive Guide</h2>
+                        <p class="mt-4 text-gray-700">Traditional productivity advice often feels like a foreign language to Intuitive Creators. This guide is different. It's designed to illuminate your unique neurological wiring and provide a transformative framework that truly resonates with your natural genius. Here, creativity isn't a distraction to be managed—it's a profound superpower waiting for the right container.</p>
+                        <p class="mt-4 text-gray-700">Use the navigation on the left to explore your profile, discover aligned systems, and find actionable strategies. This is your space to unlock sustained flow, amplify your innovative ideas, and achieve remarkable results without sacrificing the freedom and inspiration that fuel you.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Your Profile Section -->
+            <section id="profile" class="content-section">
+                 <div class="fade-in">
+                    <h1 class="text-4xl font-bold text-gray-800">Decode Your Brain</h1>
+                    <p class="mt-2 text-lg text-gray-600">Understanding your inherent gifts and growth edges is the first step to thriving.</p>
+
+                    <div class="mt-8 p-6 bg-secondary rounded-xl shadow-sm">
+                        <h2 class="text-2xl font-semibold text-accent mb-4">Your Personality at a Glance</h2>
+                        <p class="mb-6 text-gray-700">This chart provides a visual representation of your core traits. Your Natural Gifts are the superpowers you bring to the world, while your Growth Edges are the areas where focused strategies can make a huge impact. Hover over any point on the chart to learn more about each trait. The goal isn't to eliminate your edges, but to understand and support them.</p>
+                        <div class="chart-container h-[40vh] md:h-96">
+                            <canvas id="profileChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 grid md:grid-cols-2 gap-8">
+                        <div class="p-6 bg-secondary rounded-xl shadow-sm">
+                            <h3 class="text-2xl font-semibold text-accent mb-4">How Your Brilliant Brain Works</h3>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> Makes lateral connections between seemingly unrelated concepts.</li>
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> Relies on intuitive decision-making that "just feels right."</li>
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> Experiences time as fluid rather than fixed.</li>
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> Has a highly active default mode network, fueling creativity.</li>
+                            </ul>
+                        </div>
+                        <div class="p-6 bg-secondary rounded-xl shadow-sm">
+                            <h3 class="text-2xl font-semibold text-accent mb-4">What Lights You Up</h3>
+                             <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> The novelty and excitement of new projects.</li>
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> Visual and tactile creative processes.</li>
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> Social validation for your innovative ideas.</li>
+                                <li class="flex items-start"><span class="text-accent font-bold mr-3">→</span> The freedom to explore multiple pathways to a solution.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Your System Section -->
+            <section id="systems" class="content-section">
+                <div class="fade-in">
+                    <h1 class="text-4xl font-bold text-gray-800">Your Aligned Productivity System</h1>
+                    <p class="mt-2 text-lg text-gray-600">It's not about more discipline. It's about a better-fitting container for your brilliance.</p>
+
+                    <div class="mt-8 grid md:grid-cols-2 gap-8 items-center">
+                        <div class="p-8 bg-secondary rounded-xl shadow-sm">
+                            <h2 class="text-2xl font-semibold text-accent">The "Creative Container"</h2>
+                            <p class="mt-4 text-gray-700">Conventional productivity systems often feel like a cage, stifling the very creativity they're meant to support. The key is to shift your mindset. A well-designed system for an Intuitive Creator is not a cage, but a "Creative Container."</p>
+                            <p class="mt-4 text-gray-700">This container provides just enough structure to channel your expansive energy, prevent overwhelm, and guide your brilliant ideas toward completion—all without sacrificing the freedom and flexibility you need to thrive.</p>
+                        </div>
+                        <div class="p-4 flex justify-center items-center">
+                            <div class="text-center">
+                                <div class="text-6xl mb-2">📦</div>
+                                <div class="font-semibold text-lg text-accent">Supportive Structure</div>
+                                <div class="text-gray-600">vs.</div>
+                                <div class="text-6xl mt-2">⛓️</div>
+                                <div class="font-semibold text-lg text-gray-500">Rigid Cage</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10">
+                        <h2 class="text-3xl font-semibold text-gray-800 text-center">Core Principles for Flow</h2>
+                        <p class="text-center mt-2 text-gray-600">These five principles are the foundation of a system that works *with* you, not against you.</p>
+                        <div class="mt-8 grid sm:grid-cols-2 lg:grid-cols-5 gap-6 text-center">
+                            <div class="p-6 bg-secondary rounded-xl shadow-sm">
+                                <div class="text-4xl mb-3">🤸</div>
+                                <h3 class="font-semibold text-lg">Embrace Flexibility</h3>
+                                <p class="text-sm text-gray-600 mt-2">Adaptable approaches that flow with your natural rhythms will always outperform rigid schedules.</p>
+                            </div>
+                            <div class="p-6 bg-secondary rounded-xl shadow-sm">
+                                <div class="text-4xl mb-3">⚡️</div>
+                                <h3 class="font-semibold text-lg">Energy-Based Design</h3>
+                                <p class="text-sm text-gray-600 mt-2">Structure work around your creative peaks and valleys, not the clock.</p>
+                            </div>
+                             <div class="p-6 bg-secondary rounded-xl shadow-sm">
+                                <div class="text-4xl mb-3">🎨</div>
+                                <h3 class="font-semibold text-lg">Visual Engagement</h3>
+                                <p class="text-sm text-gray-600 mt-2">Leverage visual, tactile, and sensory processes to enhance focus and make work feel like play.</p>
+                            </div>
+                             <div class="p-6 bg-secondary rounded-xl shadow-sm">
+                                <div class="text-4xl mb-3">🧪</div>
+                                <h3 class="font-semibold text-lg">Iterate & Experiment</h3>
+                                <p class="text-sm text-gray-600 mt-2">Use micro-experiments to test ideas and keep your creative spark alive without heavy commitment.</p>
+                            </div>
+                            <div class="p-6 bg-secondary rounded-xl shadow-sm">
+                                <div class="text-4xl mb-3">📦</div>
+                                <h3 class="font-semibold text-lg">Container, Not Cage</h3>
+                                <p class="text-sm text-gray-600 mt-2">View structure as a tool that amplifies and guides your ideas, rather than confining them.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Strategy Toolkit Section -->
+            <section id="toolkit" class="content-section">
+                <div class="fade-in">
+                    <h1 class="text-4xl font-bold text-gray-800">Your Strategy Toolkit</h1>
+                    <p class="mt-2 text-lg text-gray-600">Actionable strategies and hacks designed for your unique brain. Click any category to explore.</p>
+                    <div id="toolkit-grid" class="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Toolkit cards will be injected here by JavaScript -->
+                    </div>
+                    <div id="toolkit-details" class="mt-8">
+                        <!-- Details will be injected here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Resource Hub Section -->
+            <section id="resources" class="content-section">
+                <div class="fade-in">
+                    <h1 class="text-4xl font-bold text-gray-800">Resource Hub</h1>
+                    <p class="mt-2 text-lg text-gray-600">A curated list of digital and physical tools that feel like extensions of your brain. Use the filters to find what you need.</p>
+
+                    <div id="resource-filters" class="mt-8 flex flex-wrap gap-2">
+                        <!-- Filter buttons will be injected here -->
+                    </div>
+
+                    <div id="resource-grid" class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Resource cards will be injected here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Troubleshoot Section -->
+            <section id="troubleshoot" class="content-section">
+                <div class="fade-in">
+                    <h1 class="text-4xl font-bold text-gray-800">Troubleshoot & Sustain Flow</h1>
+                    <p class="mt-2 text-lg text-gray-600">Navigate common hurdles with practical, on-demand solutions. Click a challenge to see the strategy.</p>
+                    <div id="accordion-container" class="mt-8 space-y-4">
+                        <!-- Accordion items will be injected here by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            function showSection(hash) {
+                const targetHash = hash || '#welcome';
+                sections.forEach(section => {
+                    if ('#' + section.id === targetHash) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === targetHash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetHash = this.getAttribute('href');
+                    history.pushState(null, null, targetHash);
+                    showSection(targetHash);
+                });
+            });
+
+            window.addEventListener('popstate', function() {
+                showSection(window.location.hash);
+            });
+
+            showSection(window.location.hash);
+
+            // Chart.js: Profile Radar Chart
+            const profileCtx = document.getElementById('profileChart');
+            if (profileCtx) {
+                const profileData = {
+                    labels: [
+                        'Creative Problem-Solving', 'Following Through', 'Adaptability to Change', 
+                        'Creating Consistency', 'Inspiring Enthusiasm', 'Managing Overwhelm', 'Quick Pivoting'
+                    ],
+                    datasets: [{
+                        label: 'Natural Gifts',
+                        data: [8, null, 9, null, 8, null, 9],
+                        backgroundColor: 'rgba(211, 169, 147, 0.2)',
+                        borderColor: 'rgba(211, 169, 147, 1)',
+                        pointBackgroundColor: 'rgba(211, 169, 147, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(211, 169, 147, 1)',
+                        spanGaps: true,
+                    }, {
+                        label: 'Growth Edges',
+                        data: [null, 7, null, 8, null, 9, null],
+                        backgroundColor: 'rgba(170, 170, 170, 0.2)',
+                        borderColor: 'rgba(170, 170, 170, 1)',
+                        pointBackgroundColor: 'rgba(170, 170, 170, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(170, 170, 170, 1)',
+                        spanGaps: true,
+                    }]
+                };
+
+                const giftDescriptions = {
+                    'Creative Problem-Solving': "Sees possibilities and innovative solutions that others often miss.",
+                    'Adaptability to Change': "Navigates and embraces change with remarkable ease, thriving in dynamic environments.",
+                    'Inspiring Enthusiasm': "Innate energy and visionary outlook that uplifts and motivates those around you.",
+                    'Quick Pivoting': "The invaluable ability to swiftly change direction when an approach isn't working."
+                };
+
+                const edgeDescriptions = {
+                    'Following Through': "Maintaining momentum on projects once the initial excitement and novelty fade.",
+                    'Creating Consistency': "Balancing the need for consistency with the inherent desire for variety.",
+                    'Managing Overwhelm': "Handling too many ideas competing for attention, which can lead to mental clutter."
+                };
+
+                new Chart(profileCtx, {
+                    type: 'radar',
+                    data: profileData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        const pointLabel = context.label;
+                                        if (context.dataset.label === 'Natural Gifts') {
+                                            label += giftDescriptions[pointLabel] || '';
+                                        } else {
+                                            label += edgeDescriptions[pointLabel] || '';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                suggestedMin: 0,
+                                suggestedMax: 10,
+                                pointLabels: {
+                                    font: {
+                                        size: 11
+                                    },
+                                    color: '#4A4A4A'
+                                },
+                                ticks: {
+                                    display: false,
+                                    stepSize: 2
+                                },
+                                grid: {
+                                    color: '#E5E7EB'
+                                },
+                                angleLines: {
+                                    color: '#E5E7EB'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Toolkit Data
+            const toolkitData = [
+                {
+                    category: 'Idea Capture',
+                    icon: '💡',
+                    description: 'Capture your brilliant ideas without derailing your focus.',
+                    strategies: [
+                        { name: 'Spark Tracking', detail: 'Carry a physical journal or use voice memos to capture ideas the moment they strike. Create dedicated "idea buckets" for different projects to stay organized.' },
+                        { name: 'Idea Incubation', detail: 'Deliberately set promising ideas aside for planned review. This allows them to develop organically without immediate pressure to act.' },
+                        { name: 'Curiosity Capture', detail: 'Have a system (like a specific note) to capture ideas that arise from curiosity mid-task. This prevents them from becoming distractions.' }
+                    ]
+                },
+                {
+                    category: 'Focus & Execution',
+                    icon: '🎯',
+                    description: 'Translate brilliant ideas into tangible results.',
+                    strategies: [
+                        { name: '15-Minute Momentum', detail: 'When excitement fades, commit to just 15 minutes of focused work. This is often enough to break through resistance and rebuild flow.' },
+                        { name: 'Project Container', detail: 'Define the scope and desired outcomes of a project, but leave the path to get there flexible. This provides structure without feeling like a cage.' },
+                        { name: 'Environment Shifts', detail: 'Physically change your workspace or location to reset your creative focus or signal a transition to a different type of work.' }
+                    ]
+                },
+                {
+                    category: 'Energy Optimization',
+                    icon: '⚡️',
+                    description: 'Align your work with your natural energy rhythms.',
+                    strategies: [
+                        { name: 'Energy-Based Prioritization', detail: 'Instead of a rigid schedule, prioritize your daily tasks based on your natural energy levels. Tackle high-focus work during your creative peaks.' },
+                        { name: 'Productive "Play"', detail: 'Integrate short sessions of unstructured "play" into your routine. This could be doodling, exploring a new topic, or anything that feels fun. It refuels your creative energy.' },
+                        { name: 'Honoring Incubation', detail: 'Recognize that creativity requires downtime. Respect these essential incubation periods for ideas to fully form, rather than forcing constant output.' }
+                    ]
+                },
+                {
+                    category: 'State Shifting',
+                    icon: '🧘',
+                    description: 'Use sensory cues to shift your creative state.',
+                     strategies: [
+                        { name: 'Sensory Anchoring', detail: 'Assign specific scents (like peppermint oil for focus), sounds (a specific playlist), or textures (a smooth stone) to different modes of work to signal a shift to your brain.' },
+                        { name: 'Boundary Rituals', detail: 'Create simple start-and-end rituals for your creative sessions. This could be making a cup of tea before you start or a 5-minute tidy-up when you finish.' },
+                        { name: 'Transition Techniques', detail: 'Practice smooth transitions between creative work and administrative tasks. Use a short buffer activity, like a 2-minute walk, to cleanse your mental palate.' }
+                    ]
+                },
+                {
+                    category: 'Sustaining Creativity',
+                    icon: '🌱',
+                    description: 'Keep your creative spark alive, even when you\'re busy.',
+                     strategies: [
+                        { name: 'Micro-Experimentation', detail: 'Test new ideas with the "smallest viable experiment." This reduces the pressure of a grand launch and encourages continuous, low-stakes exploration.' },
+                        { name: 'Novelty Infusions', detail: 'Intentionally inject new and exciting elements into your routines or long-term projects. This could be using a new tool, learning a new skill related to the project, or collaborating with someone new.' },
+                        { name: '5-Minute Creative Sprints', detail: 'During busy seasons, use very short, focused creative bursts to keep the spark alive without requiring a large time commitment.' }
+                    ]
+                },
+            ];
+
+            const toolkitGrid = document.getElementById('toolkit-grid');
+            const toolkitDetails = document.getElementById('toolkit-details');
+            if (toolkitGrid) {
+                toolkitData.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'p-6 bg-secondary rounded-xl shadow-sm cursor-pointer hover:shadow-md hover:-translate-y-1 transition-transform duration-300 card-enter';
+                    card.style.animationDelay = `${index * 100}ms`;
+                    card.innerHTML = `
+                        <div class="text-4xl mb-4">${item.icon}</div>
+                        <h3 class="text-xl font-semibold text-gray-800">${item.category}</h3>
+                        <p class="mt-2 text-gray-600">${item.description}</p>
+                    `;
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('#toolkit-grid > div').forEach(c => c.classList.remove('ring-2', 'ring-accent'));
+                        card.classList.add('ring-2', 'ring-accent');
+                        let detailsHtml = `
+                            <div class="p-8 bg-white rounded-xl shadow-lg fade-in">
+                                <h2 class="text-3xl font-bold text-accent">${item.category} Strategies</h2>
+                                <div class="mt-6 space-y-6">
+                                    ${item.strategies.map(strategy => `
+                                        <div>
+                                            <h4 class="text-xl font-semibold text-gray-800">${strategy.name}</h4>
+                                            <p class="mt-1 text-gray-600">${strategy.detail}</p>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                        toolkitDetails.innerHTML = detailsHtml;
+                        toolkitDetails.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    });
+                    toolkitGrid.appendChild(card);
+                });
+            }
+
+            // Resource Hub Data
+            const resourceData = [
+                { name: 'Miro / Mural', category: 'Visual Brainstorming', desc: 'Digital whiteboards ideal for mind mapping and connecting ideas visually.' },
+                { name: 'Notion', category: 'Customizable Workspaces', desc: 'A highly customizable workspace that blends notes, tasks, and creative elements.' },
+                { name: 'Trello', category: 'Project Management', desc: 'A visual, flexible card system that can be easily rearranged as inspiration strikes.' },
+                { name: 'Sunsama', category: 'Task Management', desc: 'Offers gentle task management without overwhelming structure, perfect for resisting rigidity.' },
+                { name: 'Focus@Will', category: 'Focus Enhancement', desc: 'Provides music specifically designed to enhance dopamine-friendly focus.' },
+                { name: 'GoodNotes', category: 'Digital Planners', desc: 'Allows for flexible layouts, stickers, and movable elements for creative planning.' },
+                { name: 'Bullet Journal', category: 'Physical Tools', desc: 'A physical notebook system that offers ultimate flexibility for planning without constraints.' },
+                { name: 'Asana (Board View)', category: 'Project Management', desc: 'Provides visual project tracking with inherent flexibility to adapt workflows.' },
+                { name: 'Google Keep', category: 'Idea Capture', desc: 'Excellent for quick, visual capture of ideas and inspiration.' },
+                { name: 'Tody', category: 'Home Management', desc: 'A visual cleaning app that turns household chores into a manageable game.' },
+                { name: 'Cozi', category: 'Home Management', desc: 'A family calendar with a strong visual mode and color-coding capabilities.' },
+            ];
+            
+            const resourceFilters = document.getElementById('resource-filters');
+            const resourceGrid = document.getElementById('resource-grid');
+            const categories = ['All', ...new Set(resourceData.map(item => item.category))];
+
+            if (resourceFilters && resourceGrid) {
+                categories.forEach(category => {
+                    const button = document.createElement('button');
+                    button.textContent = category;
+                    button.className = 'px-4 py-2 text-sm font-medium rounded-full transition-colors duration-200 resource-filter';
+                    if (category === 'All') {
+                        button.classList.add('bg-accent', 'text-white');
+                    } else {
+                        button.classList.add('bg-secondary', 'text-gray-700', 'hover:bg-gray-300');
+                    }
+                    button.dataset.category = category;
+                    resourceFilters.appendChild(button);
+                });
+
+                const filterButtons = document.querySelectorAll('.resource-filter');
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        filterButtons.forEach(btn => {
+                            btn.classList.remove('bg-accent', 'text-white');
+                            btn.classList.add('bg-secondary', 'text-gray-700');
+                        });
+                        this.classList.add('bg-accent', 'text-white');
+                        this.classList.remove('bg-secondary', 'text-gray-700');
+                        
+                        const selectedCategory = this.dataset.category;
+                        document.querySelectorAll('.resource-card').forEach(card => {
+                            if (selectedCategory === 'All' || card.dataset.category === selectedCategory) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+                
+                resourceData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'resource-card p-5 bg-secondary rounded-xl shadow-sm';
+                    card.dataset.category = item.category;
+                    card.innerHTML = `
+                        <h3 class="font-semibold text-lg text-gray-800">${item.name}</h3>
+                        <p class="text-sm text-accent font-medium mt-1">${item.category}</p>
+                        <p class="mt-3 text-sm text-gray-600">${item.desc}</p>
+                    `;
+                    resourceGrid.appendChild(card);
+                });
+            }
+
+            // Accordion Data for Troubleshooting
+            const accordionData = [
+                {
+                    title: 'When you feel trapped by structure...',
+                    content: `<strong>Immediate Action:</strong> Take a 30-min "structure break" for completely unstructured creative exploration. <br><br> <strong>System Adjustment:</strong> Review where your system feels constraining and replace rigid elements with flexible alternatives (e.g., a to-do list becomes a mind map). <br><br> <strong>Mindset Shift:</strong> Reframe the structure as a "creative container" that amplifies ideas, not a cage that limits them.`
+                },
+                {
+                    title: 'When too many ideas are competing for attention...',
+                    content: `<strong>Immediate Action:</strong> Do a rapid "idea capture" brain dump to get everything out of your head and onto paper or a digital note. <br><br> <strong>System Adjustment:</strong> Implement an "idea triage" framework. Quickly categorize ideas by excitement and effort to decide what to explore now, later, or discard. <br><br> <strong>Mindset Shift:</strong> Remember that capturing an idea does not commit you to acting on it. It's simply about honoring the spark.`
+                },
+                {
+                    title: 'When initial excitement fades but the project isn\'t done...',
+                    content: `<strong>Immediate Action:</strong> Inject novelty. Approach the project from a new angle, use a different tool, or change your environment. <br><br> <strong>System Adjustment:</strong> Break the remaining work into smaller, more engaging chunks and assign a small reward for completing each one. <br><br> <strong>Mindset Shift:</strong> Reconnect with the "future impact" of completing the project. Remind yourself why you started in the first place.`
+                },
+                {
+                    title: 'When others don\'t understand your creative process...',
+                    content: `<strong>Immediate Action:</strong> Use metaphors to explain your ideas. Instead of a detailed plan, present a "story" or a "vision" of the outcome. <br><br> <strong>System Adjustment:</strong> Create shared visual milestones (like a simple project board) that honor both your need for creativity and their need for clarity. <br><br> <strong>Mindset Shift:</strong> View different working styles as complementary, not conflicting. Your vision combined with their structure can create amazing results.`
+                }
+            ];
+
+            const accordionContainer = document.getElementById('accordion-container');
+            if(accordionContainer) {
+                accordionData.forEach(item => {
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'bg-secondary rounded-xl shadow-sm overflow-hidden';
+                    accordionItem.innerHTML = `
+                        <button class="w-full text-left p-5 flex justify-between items-center hover:bg-gray-200 focus:outline-none ring-accent">
+                            <span class="font-semibold text-lg text-gray-800">${item.title}</span>
+                            <span class="transform transition-transform duration-300 text-accent font-bold text-2xl">+</span>
+                        </button>
+                        <div class="accordion-content">
+                            <div class="p-5 border-t border-gray-200 text-gray-700">
+                                ${item.content}
+                            </div>
+                        </div>
+                    `;
+                    accordionContainer.appendChild(accordionItem);
+                });
+
+                document.querySelectorAll('#accordion-container button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const content = button.nextElementSibling;
+                        const icon = button.querySelector('span:last-child');
+                        
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                            icon.classList.remove('rotate-45');
+                        } else {
+                            // Close other accordions
+                            document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                            document.querySelectorAll('#accordion-container button span:last-child').forEach(i => i.classList.remove('rotate-45'));
+                            
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            icon.classList.add('rotate-45');
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
